@@ -101,6 +101,39 @@ Existing config files from older versions are migrated on load. If a config has 
 
 If a `summary` block already exists, it is left unchanged.
 
+## Programmatic API
+
+Extensions can reuse the review engine without registering or invoking the
+`/review` command through the side-effect-free API entry point:
+
+```ts
+import {
+  buildReviewConversationSummary,
+  buildReviewTask,
+  detectReviewContext,
+  getFinalOutput,
+  isSubagentFailure,
+  resolveReviewConfig,
+  runReviewSubagent,
+} from "@howaboua/pi-subagent-review/api";
+
+const review = await detectReviewContext(pi, ctx.cwd);
+const config = await resolveReviewConfig(pi, ctx);
+const summary = await buildReviewConversationSummary(ctx, config);
+const task = buildReviewTask(review, "", summary);
+const details = await runReviewSubagent(task, review.repoRoot, config, ctx.signal);
+
+if (isSubagentFailure(details)) {
+  throw new Error(details.errorMessage || details.stderr);
+}
+
+const findings = getFinalOutput(details.messages);
+```
+
+Importing this entry point does not register commands, create configuration,
+send session messages, or render UI. Consumers own those orchestration choices.
+The default package entry point and `/review` behavior are unchanged.
+
 ## Install
 
 Installation methods:

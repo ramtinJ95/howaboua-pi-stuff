@@ -4,7 +4,10 @@
 	"description": "Pi extension that adds /review via an isolated review subagent.",
 	"type": "module",
 	"main": "index.ts",
-	"exports": "./index.ts",
+	"exports": {
+		".": "./index.ts",
+		"./api": "./src/api.ts"
+	},
 	"license": "MIT",
 	"files": [
 		"index.ts",
